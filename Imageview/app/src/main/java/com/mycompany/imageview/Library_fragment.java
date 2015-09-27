@@ -23,26 +23,30 @@ public class Library_fragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        create_webview();
-        create_button();
+        View rootview = inflater.inflate(R.layout.fragment_library_fragment, container, false);
+        create_webview(rootview);
+        create_button(rootview);
 
-        return inflater.inflate(R.layout.fragment_search_fragment, container, false);
+        return rootview;
     }
 
 
-    public  void create_webview(){
-        mWebView = (WebView)getView().findViewById(R.id.activity_main_webview);
+    public  void create_webview(View view){
+        mWebView = (WebView)view.findViewById(R.id.library_webview);
 
         // Enable Javascript
         WebSettings webSettings = mWebView.getSettings();
         webSettings.setJavaScriptEnabled(true);
+        webSettings.setBuiltInZoomControls(true);
+        webSettings.setUseWideViewPort(true);
+        webSettings.setLoadWithOverviewMode(true);
         mWebView.loadUrl("http://beta.html5test.com/");
     }
 
 
-    public void create_button(){
+    public void create_button(View view){
         Button button_search;
-        button_search=(Button)getView().findViewById(R.id.button_search);
+        button_search=(Button)view.findViewById(R.id.button_search);
         button_search.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

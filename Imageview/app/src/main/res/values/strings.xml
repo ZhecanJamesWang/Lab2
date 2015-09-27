@@ -3,7 +3,7 @@
     <string name="Title">ImageVIew</string>
     <string name="action_settings">Settings</string>
     <string name="button_library">library</string>
-    <string name="button_search">search</string>
+    <string name="button_google">google</string>
     <string name="search_hint">google!</string>
     <string name="search_button">search</string>
 <!-- TODO: Remove or change this placeholder text -->

@@ -12,13 +12,14 @@
         android:id="@+id/button_search"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/button_search"
+        android:text="@string/button_google"
         android:layout_alignParentTop="true"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true" />
     <WebView
-        android:id="@+id/activity_main_webview"
+        android:id="@+id/library_webview"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:layout_below="@+id/button_search" />
 
 </RelativeLayout>
