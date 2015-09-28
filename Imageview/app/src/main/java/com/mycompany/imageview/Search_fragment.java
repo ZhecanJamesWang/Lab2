@@ -24,9 +24,12 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.android.gms.appdatasearch.GetRecentContextCall;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
+
+import java.util.ArrayList;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -37,6 +40,9 @@ public class Search_fragment extends Fragment {
     }
 
     private WebView mWebView;
+    private EditText editText;
+    private ArrayList<String> link_array = new ArrayList<>();
+    private int pointer;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -44,18 +50,19 @@ public class Search_fragment extends Fragment {
 
         View rootView = inflater.inflate(R.layout.fragment_search_fragment, container, false);
 //        text_input(rootView);
-        final EditText editText = (EditText)rootView.findViewById(R.id.google_search);
-        create_button(rootView, "library", editText);
-        create_button(rootView, "search", editText);
+        editText = (EditText)rootView.findViewById(R.id.google_search);
+        create_button(rootView, "library");
+        create_button(rootView, "search");
+        create_button(rootView, "next");
+        create_button(rootView, "previous");
         create_webview(rootView);
 
         return rootView;
     }
 
 
-    public void create_button(View v, String button, EditText editText ){
-        final EditText ED = editText;
-        if (button == "library" ){
+    public void create_button(View v, String button){
+        if (button.equals("library") ){
             Button button_library;
             button_library = (Button) v.findViewById(R.id.button_library);
 
@@ -66,16 +73,40 @@ public class Search_fragment extends Fragment {
                 }
             });
         }
-        if (button == "search" ){
+        if (button.equals("search") ){
             Button button_search;
             button_search = (Button) v.findViewById(R.id.button_search);
 
             button_search.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    String keyword = ED.getText().toString();
+                    String keyword = editText.getText().toString();
                     Log.d("gettext", keyword);
                     google_search(keyword);
+                }
+            });
+        }
+        if (button.equals("next") ){
+            Button button_search;
+            button_search = (Button) v.findViewById(R.id.button_search_next);
+
+            button_search.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    pointer+=1;
+                    reload_webview();
+                }
+            });
+        }
+        if (button.equals("previous") ){
+            Button button_search;
+            button_search = (Button) v.findViewById(R.id.button_search_previous);
+
+            button_search.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    pointer-=1;
+                    reload_webview();
                 }
             });
         }
@@ -98,10 +129,21 @@ public class Search_fragment extends Fragment {
         webSettings.setBuiltInZoomControls(true);
         webSettings.setUseWideViewPort(true);
         webSettings.setLoadWithOverviewMode(true);
-        mWebView.loadUrl("http://i.ytimg.com/vi/tntOCGkgt98/maxresdefault.jpg");
+        String link;
+        link ="http://i.ytimg.com/vi/tntOCGkgt98/maxresdefault.jpg";
+        mWebView.loadUrl(link);
     }
 
-
+    public  void reload_webview(){
+        String link;
+        if (link_array.size()>0) {
+            link = link_array.get(pointer % link_array.size());
+        }
+        else{
+            link ="http://i.ytimg.com/vi/tntOCGkgt98/maxresdefault.jpg";
+        }
+        mWebView.loadUrl(link);
+    }
     public void google_search(String search) {
         // setup requestqueue here. Usually you should set up one queue for global use
         RequestQueue queue = Volley.newRequestQueue(getActivity());
@@ -116,11 +158,6 @@ public class Search_fragment extends Fragment {
 
         // setup the necessary json body for google search
         JSONObject body = new JSONObject();
-        try {
-            body.put("random", "thing"); // unnecessary, but I wanted to show you how to include body data
-        } catch (Exception e) {
-            Log.e("JSONException", e.getMessage());
-        }
 
         JsonObjectRequest getRequest = new JsonObjectRequest(
                 Request.Method.GET,
@@ -130,6 +167,7 @@ public class Search_fragment extends Fragment {
                     @Override
                     public void onResponse(JSONObject response) {
                         // do something with response
+                        parse_json(response);
                         Log.d("Response", response.toString());
                     }
                 },
@@ -142,6 +180,20 @@ public class Search_fragment extends Fragment {
         );
 
         queue.add(getRequest);
+    }
+    public void parse_json(JSONObject response){
+        try {
+            JSONArray items = response.getJSONArray("items");
+            for(int i=0; i<items.length();i+=1){
+                JSONObject item = (JSONObject) items.get(i);
+                link_array.add(item.getString("link"));
+            }
+
+        }
+        catch (Exception error){
+            Log.e("Error", error.getMessage());
+        }
+
     }
 }
 
