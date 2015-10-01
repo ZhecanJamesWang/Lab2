@@ -43,6 +43,11 @@ public class Search_fragment extends Fragment {
     private EditText editText;
     private ArrayList<String> link_array = new ArrayList<>();
     private int pointer;
+    private String link;
+    private String keyword;
+    private MySQLiteHelper db;
+
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -50,11 +55,14 @@ public class Search_fragment extends Fragment {
 
         View rootView = inflater.inflate(R.layout.fragment_search_fragment, container, false);
 //        text_input(rootView);
+
+        db = new MySQLiteHelper(getActivity());
         editText = (EditText)rootView.findViewById(R.id.google_search);
         create_button(rootView, "library");
         create_button(rootView, "search");
         create_button(rootView, "next");
         create_button(rootView, "previous");
+        create_button(rootView, "save");
         create_webview(rootView);
 
         return rootView;
@@ -80,7 +88,7 @@ public class Search_fragment extends Fragment {
             button_search.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    String keyword = editText.getText().toString();
+                    keyword = editText.getText().toString();
                     Log.d("gettext", keyword);
                     google_search(keyword);
                 }
@@ -110,7 +118,26 @@ public class Search_fragment extends Fragment {
                 }
             });
         }
-    }
+        if (button.equals("save") ){
+            final Button button_save;
+            button_save = (Button) v.findViewById(R.id.button_save);
+
+            button_save.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (link_array.size()>0) {
+                        link = link_array.get(pointer % link_array.size());
+                        Log.i("button_save", "save ");
+                    }
+                    else{
+                        link ="http://i.ytimg.com/vi/tntOCGkgt98/maxresdefault.jpg";
+                        Log.i("button_save", "save_first ");
+                    }
+                    db.add_image(new Image_DB(keyword,link));
+                    Log.i("button_save", "save_after ");
+                }
+            });
+        }}
 
 
     public void transitionToFragment() {
@@ -129,18 +156,16 @@ public class Search_fragment extends Fragment {
         webSettings.setBuiltInZoomControls(true);
         webSettings.setUseWideViewPort(true);
         webSettings.setLoadWithOverviewMode(true);
-        String link;
-        link ="http://i.ytimg.com/vi/tntOCGkgt98/maxresdefault.jpg";
+        link ="http://www.canon-europe.com/images/Android-logo_tcm13-1232684.png";
         mWebView.loadUrl(link);
     }
 
     public  void reload_webview(){
-        String link;
+        if (pointer<0){
+            pointer=0;
+        }
         if (link_array.size()>0) {
             link = link_array.get(pointer % link_array.size());
-        }
-        else{
-            link ="http://i.ytimg.com/vi/tntOCGkgt98/maxresdefault.jpg";
         }
         mWebView.loadUrl(link);
     }
